@@ -3,7 +3,7 @@ import './App.css'
 
 function App() {
 
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<{ text: string; time: string }[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -11,7 +11,10 @@ function App() {
     const ws = new WebSocket("ws://localhost:8080"); //intialize a ws server at first render
 
     ws.onmessage = (e) => {
-      setMessages(m => [...m, e.data])
+      const now = new Date();
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      setMessages(m => [...m, { text: e.data, time }]);
     }
 
     wsRef.current = ws;
@@ -47,26 +50,27 @@ function App() {
           ) : (
             messages.map((message, index) => (
               <article key={index} className="message-bubble">
-                <span>{message}</span>
+                <span className='message-text'>{message.text}</span>
+                <span className='message-time'>{message.time}</span>
               </article>
             ))
           )}
         </section>
 
         <div className='composer'>
-          <input ref={inputRef} id='message' className='composer-input' placeholder='Send a sakura-soft note..'/>
-          <button className='composer-button' 
-          onClick={() => {
-            const message = inputRef.current?.value;
-            wsRef.current?.send(
-              JSON.stringify({
-                type: 'chat',
-                payload: {
-                  message: message
-                }
-              })
-            )
-          }}>
+          <input ref={inputRef} id='message' className='composer-input' placeholder='Send a sakura-soft note..' />
+          <button className='composer-button'
+            onClick={() => {
+              const message = inputRef.current?.value;
+              wsRef.current?.send(
+                JSON.stringify({
+                  type: 'chat',
+                  payload: {
+                    message: message
+                  }
+                })
+              )
+            }}>
             Send
           </button>
         </div>
