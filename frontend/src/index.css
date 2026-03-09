@@ -1,1 +1,89 @@
 @import "tailwindcss";
+
+@layer base {
+	:root {
+		font-family: "SF Pro Rounded", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		color: #1f2933;
+		line-height: 1.4;
+	}
+
+	body {
+		margin: 0;
+		min-height: 100vh;
+		background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.9) 0, transparent 40%),
+			radial-gradient(circle at 70% 15%, rgba(206, 214, 223, 0.6) 0, transparent 42%),
+			radial-gradient(circle at 45% 82%, rgba(223, 230, 233, 0.7) 0, transparent 45%),
+			linear-gradient(180deg, #f3f4f6 0%, #d3d6dc 100%);
+	}
+}
+
+@layer components {
+	.glass-panel {
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.1));
+		box-shadow: 0 30px 60px rgba(15, 23, 42, 0.36), 0 6px 18px rgba(15, 23, 42, 0.18);
+		border: 1px solid rgba(255, 255, 255, 0.65);
+		backdrop-filter: saturate(140%) blur(20px);
+	}
+
+	.glass-panel::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: linear-gradient(160deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0) 100%);
+	}
+
+	.glass-panel::after {
+		content: "";
+		position: absolute;
+		inset: 1px;
+		border-radius: 21px;
+		pointer-events: none;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.glass-bubble {
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(236, 240, 244, 0.42));
+		box-shadow: 0 12px 20px rgba(15, 23, 42, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.55);
+		backdrop-filter: blur(12px);
+	}
+
+	.glass-input {
+		border: 1px solid rgba(255, 255, 255, 0.6);
+		background: rgba(255, 255, 255, 0.35);
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.glass-input:focus {
+		outline: none;
+		border-color: rgba(59, 130, 246, 0.85);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+		background: rgba(255, 255, 255, 0.6);
+	}
+
+	.glass-button {
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 232, 235, 0.85));
+		box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+		transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.2s ease;
+	}
+
+	.glass-button:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 16px 28px rgba(15, 23, 42, 0.22);
+	}
+
+	.glass-button:active {
+		transform: translateY(0);
+		box-shadow: 0 6px 14px rgba(15, 23, 42, 0.2);
+	}
+}
+
+.message-scroll::-webkit-scrollbar {
+	width: 8px;
+}
+
+.message-scroll::-webkit-scrollbar-thumb {
+	background: rgba(148, 163, 184, 0.4);
+	border-radius: 999px;
+}

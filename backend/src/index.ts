@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 
-const wss = new WebSocketServer({ port: 8080 });
+const PORT = Number(process.env.PORT) || 8080;
+const wss = new WebSocketServer({ port: PORT });
 
 interface User {
     socket: WebSocket;
@@ -12,6 +13,7 @@ let allSockets: User[] = [];
 wss.on('connection', (socket) => {
     socket.on('message', (message) => {
         const parsedMessage = JSON.parse(message as unknown as string);
+        // if the message type is "join", we can add the user to a room
         if (parsedMessage.type === "join") {
             console.log(`User joined room: ${parsedMessage.payload.roomId}`);
             allSockets.push({
@@ -22,15 +24,23 @@ wss.on('connection', (socket) => {
 
         if (parsedMessage.type === "chat") {
             console.log(`User sent message: ${parsedMessage.payload.message}`);
-            // Find the room of the current user.
+            // Find the room of the current user
             const currentUserRoom = allSockets.find((x) => x.socket == socket)?.room;
 
-            // Broadcast the message to all users in the same room.
+            // Broadcast the message to all users in the same room
             allSockets.forEach((user) => {
                 if (user.room === currentUserRoom) {
-                    user.socket.send(parsedMessage.payload.message)
+                    user.socket.send(JSON.stringify({
+                        name: parsedMessage.payload.name,
+                        message: parsedMessage.payload.message
+                    }))
                 }
             });
         }
+    });
+
+    socket.on('close', () => {
+        // Remove the user from the list of all sockets when they disconnect
+        allSockets = allSockets.filter((x) => x.socket !== socket);
     });
 });

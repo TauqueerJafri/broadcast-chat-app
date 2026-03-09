@@ -1,81 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import './App.css'
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import Landing from './pages/Landing'
+import Chat from './pages/Chat'
 
 function App() {
-
-  const [messages, setMessages] = useState<{ text: string; time: string }[]>([]);
-  const wsRef = useRef<WebSocket | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080"); //intialize a ws server at first render
-
-    ws.onmessage = (e) => {
-      const now = new Date();
-      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      setMessages(m => [...m, { text: e.data, time }]);
-    }
-
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        type: "join",
-        payload: {
-          roomId: "red"
-        }
-      }))
-    }
-
-    return () => {
-      ws.close()
-    }
-  }, []); //dependency array empty -> on Mount effect
-
   return (
-    <div className='app-shell'>
-      <main className='chat-panel'>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/chat/:roomId" element={<Chat />} />
+      </Routes>
+    </BrowserRouter>
 
-        <header className='panel-header'>
-          <div>
-            <h1> Chat App</h1>
-            <p> Send a message to everyone in the room</p>
-          </div>
-        </header>
-
-        <section className='message-list'>
-          {messages.length === 0 ? (
-            <div className='empty-state'> Begin with a greeting...</div>
-          ) : (
-            messages.map((message, index) => (
-              <article key={index} className="message-bubble">
-                <span className='message-text'>{message.text}</span>
-                <span className='message-time'>{message.time}</span>
-              </article>
-            ))
-          )}
-        </section>
-
-        <div className='composer'>
-          <input ref={inputRef} id='message' className='composer-input' placeholder='Send a sakura-soft note..' />
-          <button className='composer-button'
-            onClick={() => {
-              const message = inputRef.current?.value;
-              wsRef.current?.send(
-                JSON.stringify({
-                  type: 'chat',
-                  payload: {
-                    message: message
-                  }
-                })
-              )
-            }}>
-            Send
-          </button>
-        </div>
-      </main>
-    </div>
   )
 }
 
