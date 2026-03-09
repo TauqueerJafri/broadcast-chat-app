@@ -1,46 +1,64 @@
 import { WebSocketServer, WebSocket } from "ws";
+import { createServer } from "http";
 
 const PORT = Number(process.env.PORT) || 8080;
-const wss = new WebSocketServer({ port: PORT });
 
 interface User {
-    socket: WebSocket;
-    room: string;
+  socket: WebSocket;
+  roomId: string;
 }
 
-let allSockets: User[] = [];
+const users: User[] = [];
 
-wss.on('connection', (socket) => {
-    socket.on('message', (message) => {
-        const parsedMessage = JSON.parse(message as unknown as string);
-        // if the message type is "join", we can add the user to a room
-        if (parsedMessage.type === "join") {
-            console.log(`User joined room: ${parsedMessage.payload.roomId}`);
-            allSockets.push({
-                socket,
-                room: parsedMessage.payload.roomId
-            })
+// Simple HTTP server to handle health checks
+const server = createServer((req, res) => {
+  if (req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok" }));
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+const wss = new WebSocketServer({ server });
+
+wss.on("connection", (socket) => {
+  socket.on("message", (raw) => {
+    const msg = JSON.parse(raw.toString());
+
+    switch (msg.type) {
+      case "join": {
+        users.push({ socket, roomId: msg.payload.roomId });
+        console.log(`User joined room: ${msg.payload.roomId}`);
+        break;
+      }
+
+      case "chat": {
+        const senderRoom = users.find((u) => u.socket === socket)?.roomId;
+        if (!senderRoom) return;
+
+        const broadcast = JSON.stringify({
+          name: msg.payload.name,
+          message: msg.payload.message,
+        });
+
+        for (const user of users) {
+          if (user.roomId === senderRoom) {
+            user.socket.send(broadcast);
+          }
         }
+        break;
+      }
+    }
+  });
 
-        if (parsedMessage.type === "chat") {
-            console.log(`User sent message: ${parsedMessage.payload.message}`);
-            // Find the room of the current user
-            const currentUserRoom = allSockets.find((x) => x.socket == socket)?.room;
+  socket.on("close", () => {
+    const index = users.findIndex((u) => u.socket === socket);
+    if (index !== -1) users.splice(index, 1);
+  });
+});
 
-            // Broadcast the message to all users in the same room
-            allSockets.forEach((user) => {
-                if (user.room === currentUserRoom) {
-                    user.socket.send(JSON.stringify({
-                        name: parsedMessage.payload.name,
-                        message: parsedMessage.payload.message
-                    }))
-                }
-            });
-        }
-    });
-
-    socket.on('close', () => {
-        // Remove the user from the list of all sockets when they disconnect
-        allSockets = allSockets.filter((x) => x.socket !== socket);
-    });
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
