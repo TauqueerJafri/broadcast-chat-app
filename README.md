@@ -12,8 +12,7 @@
   <a href="#features">Features</a>&nbsp;&nbsp;•&nbsp;&nbsp;
   <a href="#tech-stack">Tech Stack</a>&nbsp;&nbsp;•&nbsp;&nbsp;
   <a href="#architecture">Architecture</a>&nbsp;&nbsp;•&nbsp;&nbsp;
-  <a href="#getting-started">Getting Started</a>&nbsp;&nbsp;•&nbsp;&nbsp;
-  <a href="#roadmap">Roadmap</a>
+  <a href="#getting-started">Getting Started</a>
 </p>
 
 <p align="center">
@@ -213,22 +212,6 @@ npm start
 ```
 
 Ensure `PORT` is set by your hosting provider, and that WebSocket connections are supported.
-
----
-
-## Roadmap
-
-> **Broadcast Chat** is actively evolving. Here's what's coming next:
-
-- [ ] 🤖 **AI-Powered Features** — Smart message suggestions, conversation summarization, auto-moderation, and intelligent replies *(coming soon)*
-- [ ] 🔐 **Authentication** — User accounts with persistent identity
-- [ ] 💾 **Message Persistence** — Chat history stored in a database
-- [ ] 👥 **Online Presence** — See who's currently in the room
-- [ ] ✏️ **Typing Indicators** — Know when someone is composing a message
-- [ ] 🖼️ **Media Sharing** — Send images, files, and links with rich previews
-- [ ] 🔔 **Notifications** — Browser push notifications for new messages
-- [ ] 🌙 **Dark Mode** — Toggle between light and dark themes
-- [ ] 📦 **Monorepo Tooling** — Unified workspace with shared types between frontend and backend
 
 ---
 
